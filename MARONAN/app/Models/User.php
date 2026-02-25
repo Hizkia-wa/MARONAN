@@ -2,47 +2,61 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+        'role',
+        'address',
+        'village',
+        'farmer_id_number',
+        'farm_address',
+        'land_area',
+        'main_commodity',
+        'commitment_statement',
+        'supporting_document',
+        'verification_status',
+        'verification_notes',
+        'verified_at',
+        'rejection_count',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'verified_at' => 'datetime',
+    ];
+
+    // 1 Petani memiliki banyak produk
+    public function products()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Product::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isPetani()
+    {
+        return $this->role === 'petani';
+    }
+
+    public function isApproved()
+    {
+        return $this->verification_status === 'approved';
     }
 }

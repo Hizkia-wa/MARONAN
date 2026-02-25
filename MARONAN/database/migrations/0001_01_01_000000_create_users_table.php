@@ -6,44 +6,45 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+
+            // Data Dasar
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('phone', 20);
             $table->string('password');
-            $table->rememberToken();
+
+            // Role
+            $table->enum('role', ['admin', 'petani'])->default('petani');
+
+            // Data Umum
+            $table->text('address')->nullable();
+            $table->string('village', 150)->nullable();
+
+            // Data Khusus Petani
+            $table->string('farmer_id_number', 100)->nullable();
+            $table->text('farm_address')->nullable();
+            $table->string('land_area', 50)->nullable();
+            $table->string('main_commodity', 100)->nullable();
+            $table->text('commitment_statement')->nullable();
+            $table->string('supporting_document')->nullable();
+
+            // Verifikasi
+            $table->enum('verification_status', ['pending', 'approved', 'rejected'])
+                  ->default('pending');
+            $table->text('verification_notes')->nullable();
+            $table->timestamp('verified_at')->nullable();
+            $table->integer('rejection_count')->default(0);
+
             $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
     }
 };
